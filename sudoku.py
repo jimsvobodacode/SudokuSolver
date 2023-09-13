@@ -10,7 +10,10 @@ class Sudoku:
 
     # load game grid from text file in data subfolder
     def LoadGame(self):
-        with open(Path(os.getcwd(),'data/game2.txt')) as f:
+        # game3.txt is easy
+        # game2.txt is "world's hardest"
+        # game1.txt is difficult
+        with open(Path(os.getcwd(),'data/game3.txt')) as f:
             row = 0
             for line in f:
                 line = line.strip()
@@ -43,7 +46,7 @@ class Sudoku:
                 if cell.value == "":
                     for tryvalue in range(1, 10):
                         if str(tryvalue) not in cell.failedValue:
-                            result = self.CheckValue(cell.row, cell.column, tryvalue)
+                            result = self.CheckValue(cell.row, cell.column, tryvalue) and self.CheckSubGrid(cell.row, cell.column, tryvalue)
                             if result == True:
                                 cell.value = str(tryvalue)
                                 break
@@ -78,6 +81,39 @@ class Sudoku:
                     if cell.value != "" and int(cell.value) == value:
                         return False
                 break
+        return True
+    
+    # check if a given cell value is valid (doesn't conflict with other values in same subgrid)
+    def CheckSubGrid(self, row, column, value):
+        minrow = 0
+        maxrow = 0
+        if row <= 2:
+            minrow = 0
+            maxrow = 2
+        elif row > 2 and row <= 5:
+            minrow = 3
+            maxrow = 5
+        else:
+            minrow = 6
+            maxrow = 8
+        mincol = 0
+        maxcol = 0
+        if column <= 2:
+            mincol = 0
+            maxcol = 2
+        elif column > 2 and column <= 5:
+            mincol = 3
+            maxcol = 5
+        else:
+            mincol = 6
+            maxcol = 8
+        
+        for checkrow in range(minrow,maxrow+1):
+            for checkcolumn in range(mincol,maxcol+1):
+                cell = self.GetCell(checkrow, checkcolumn)
+                if cell.value != "" and int(cell.value) == value:
+                    return False
+            break
         return True
     
     # display grid for review
